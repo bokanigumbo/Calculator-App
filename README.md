@@ -3,14 +3,15 @@
 a fun, emoji-themed calculator built with **HTML**, **CSS**, and **JavaScript**.  
 Designed to be simple, responsive, and just a little bit adorable ✨
 
-## 🚀 Live Demo
+## 🚀 live Demo
 
-👉 [Try it here](https://bokanigumbo.github.io/cute-calculator)
+👉 [Try it here](https://bokanigumbo.github.io/Calculator-App/)
 
 ## ✨ features
 
 - basic arithmetic: add, subtract, multiply, divide
-- Clear button to reset input
+- toggle between light and dark mode with one click
+- backspace and `C` clear buttons
 - Cute and colorful button design
 - Hover effects for better interactivity
 - Responsive layout (works on mobile + desktop)
