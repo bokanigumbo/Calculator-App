@@ -5,7 +5,7 @@ designed to be simple, responsive, and a little bit adorable ✨
 
 ## 🚀 live demo
 
-👉 [Try it here](https://bokanigumbo.github.io/Calculator-App/)
+👉 [try it here](https://bokanigumbo.github.io/Calculator-App/)
 
 ## ✨ features
 
