@@ -1,0 +1,8 @@
+{
+  "name": "cute-calculator",
+  "version": "1.0.0",
+  "description": "a pastel calculator with light/dark themes and a real arithmetic parser (no eval)",
+  "scripts": {
+    "test": "node tests/calculator-engine.test.js"
+  }
+}
