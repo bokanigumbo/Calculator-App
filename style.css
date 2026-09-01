@@ -55,7 +55,7 @@ body {
   background: var(--display-bg);
   border-radius: 30px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  width: 330px;
+  width: min(330px, calc(100vw - 40px));
   overflow: hidden;
   padding: 20px;
   transition: background 0.3s ease;
@@ -109,4 +109,12 @@ body {
 
 .zero {
   grid-column: span 2;
+}
+
+/* visible keyboard focus - the hover state alone doesn't show up for
+   keyboard/switch users tabbing through the buttons */
+.btn:focus-visible,
+#theme-toggle:focus-visible {
+  outline: 3px solid var(--equal);
+  outline-offset: 2px;
 }
