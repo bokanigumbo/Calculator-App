@@ -1,4 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2&display=swap');
+/* the Baloo 2 font is loaded via a <link> tag in index.html, not an
+   @import here - a link tag lets the browser discover and fetch it in
+   parallel with everything else; an @import forces a slower, blocking,
+   sequential fetch after this stylesheet itself loads. having both (as
+   this file used to) meant it was being requested twice for no benefit. */
 
 :root {
   --bg: #fff0f5;
