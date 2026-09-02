@@ -2,7 +2,7 @@
 
 a pastel-themed calculator with light/dark modes, built in vanilla HTML/CSS/JS - no frameworks, no build step.
 
-*(a screenshot goes here - grab one once you've got this running locally, since it's a small visual project worth actually seeing rather than just reading about)*
+**live demo:** [try it here](https://bokanigumbo.github.io/Calculator-App/)
 
 ## features
 
@@ -33,33 +33,14 @@ no build step - just open `index.html` in a browser.
 npm test
 ```
 
-18 tests covering the calculation engine: basic arithmetic, operator precedence, negative numbers, floating-point rounding, and every invalid-input case from the original bug list. these test `calculator-engine.js` directly, not the browser UI - a full test of the keyboard/click wiring would need a real browser environment (jsdom or similar), which felt like a larger addition than this project needs right now.
+23 tests covering the calculation engine: basic arithmetic, operator precedence, negative numbers, floating-point rounding, and every invalid-input case from the original bug list, plus edge cases around numbers themselves: a bare decimal point (`.`, which `parseFloat` silently turns into `NaN` if left unchecked), numbers too large to represent at all, and results that overflow past `Number.MAX_VALUE` during a calculation even when both inputs were fine on their own. these test `calculator-engine.js` directly, not the browser UI - a full test of the keyboard/click wiring would need a real browser environment (jsdom or similar), which felt like a larger addition than this project needs right now.
 
 ## known limitations
 
 - no memory functions (M+, M-, MR)
 - no support for parentheses - `2*(3+4)` isn't understood, only left-to-right expressions with standard precedence
 - the DOM/keyboard wiring in `script.js` is manually verified, not covered by the automated tests (see above)
-#  cute calculator
 
-a fun, emoji-themed calculator built with **HTML**, **CSS**, and **JavaScript**.  
-designed to be simple, responsive, and a little bit adorable ✨
+## license
 
-## 🚀 live demo
-
-👉 [try it here](https://bokanigumbo.github.io/Calculator-App/)
-
-## ✨ features
-
-- basic arithmetic: add, subtract, multiply, divide
-- toggle between light and dark mode with one click
-- backspace and `C` clear buttons
-- cute and colorful button design
-- hover effects for better interactivity
-- responsive layout (works on mobile + desktop)
-
-## 🛠 built With
-
-- HTML  
-- CSS  
-- JavaScript
+MIT - see [LICENSE](LICENSE).

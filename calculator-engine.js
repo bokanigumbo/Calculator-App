@@ -51,7 +51,17 @@ function tokenize(expression) {
       if ((numStr.match(/\./g) || []).length > 1) {
         throw new InvalidExpressionError("A number can't contain more than one decimal point");
       }
-      tokens.push({ type: "number", value: parseFloat(numStr) });
+      const value = parseFloat(numStr);
+      // parseFloat(".") returns NaN (a decimal point with no digits either
+      // side of it isn't a number at all), and a digit string long enough
+      // to exceed Number.MAX_VALUE silently becomes Infinity - both are
+      // real values JavaScript happily hands back without erroring, so
+      // this has to check for them explicitly rather than trusting
+      // parseFloat's result is always a normal, usable number
+      if (!Number.isFinite(value)) {
+        throw new InvalidExpressionError("Number is outside the supported range");
+      }
+      tokens.push({ type: "number", value });
       continue;
     }
 
@@ -143,7 +153,16 @@ function evaluate(expression) {
   if (tokens.length === 0) {
     throw new InvalidExpressionError("Nothing to calculate");
   }
-  return roundResult(parse(tokens));
+  const result = roundResult(parse(tokens));
+  // every individual number is already checked in tokenize() above, but
+  // the RESULT of an operation can still overflow even when both inputs
+  // were perfectly ordinary finite numbers (e.g. two large numbers
+  // multiplied together) - this is the second, separate place that needs
+  // checking, not a duplicate of the first
+  if (!Number.isFinite(result)) {
+    throw new InvalidExpressionError("Number is outside the supported range");
+  }
+  return result;
 }
 
 // works both as a plain global in the browser (loaded via <script>, no

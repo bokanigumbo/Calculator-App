@@ -87,6 +87,45 @@ test("trailing operator is rejected: 5+", () => {
   assert.throws(() => evaluate("5+"), InvalidExpressionError);
 });
 
+test("a decimal point with no digits either side of it is rejected: .", () => {
+  // parseFloat(".") silently returns NaN in plain javascript - this is
+  // exactly the kind of "technically a number, not actually a number"
+  // result that needed an explicit finite-value check to catch
+  assert.throws(() => evaluate("."), InvalidExpressionError);
+});
+
+test("a result that overflows past Number.MAX_VALUE is rejected, not silently returned as Infinity", () => {
+  // two individually finite numbers whose PRODUCT exceeds javascript's
+  // maximum representable number (~1.8e308) - this is the second,
+  // separate check (on the calculated result), not the same code path as
+  // the "individual number too large" test below
+  const bigButFiniteNumber = "9".repeat(160); // ~1e160, well within finite range on its own
+  assert.throws(() => evaluate(`${bigButFiniteNumber}*${bigButFiniteNumber}`), InvalidExpressionError);
+});
+
+test("a single number literal too large to represent at all is rejected: a 400-digit number", () => {
+  // this one overflows to Infinity from parseFloat() on the number ITSELF,
+  // before any arithmetic even happens - catches it at tokenize time, not
+  // calculation time
+  const impossiblyLongNumber = "9".repeat(400);
+  assert.throws(() => evaluate(impossiblyLongNumber), InvalidExpressionError);
+});
+
+test("repeated unary minus signs are supported and evaluate as double negation: --5 equals 5", () => {
+  // this calculator DOES intentionally support this: the grammar already
+  // handles any number of leading unary minus signs correctly as nested
+  // negation, and "negative of a negative" is genuinely correct arithmetic
+  // (not an input a user could actually type via the on-screen/keyboard
+  // UI, since script.js's own input handling replaces a second consecutive
+  // "-" rather than stacking it - but the engine itself is intentionally
+  // correct for direct/programmatic use beyond just this one UI)
+  assert.strictEqual(evaluate("--5"), 5);
+});
+
+test("three repeated unary minus signs correctly evaluate as an odd number of negations: ---5 equals -5", () => {
+  assert.strictEqual(evaluate("---5"), -5);
+});
+
 // ===== runner =====
 let passed = 0, failed = 0;
 for (const { name, fn } of tests) {
