@@ -3,12 +3,14 @@
    and a keypad of flat, connected regions - not a rounded card holding a
    collection of individually-shadowed floating buttons.
 
-   colour has exactly five roles, each used once: the shell/equals share
-   one colour (oxblood), the display is a dark variant of that same
-   colour family, keys and display text share a warm neutral (ecru/cream),
-   operator glyphs get one accent (mustard), and coral is reserved
-   entirely for focus rings and the one structural seam below the
-   display - never a key fill.
+   colour keeps its five roles unchanged from the previous pass - this
+   revision is entirely about geometry and weight distribution, not
+   colour: a consistently narrow operator column top-to-bottom (rather
+   than operators being scattered across a mixed top row and then a
+   separate side column), a proportionate equals key instead of a giant
+   two-row block, thinner internal grid lines, and a theme toggle that
+   lives inside the display's own surface instead of a separate strip
+   above it.
 */
 
 :root {
@@ -62,41 +64,42 @@ body.dark { background: #0D0908; }
   transition: background 0.2s ease;
 }
 
-/* ===== theme control - integrated into the shell's own top edge, not a
-   floating circular bubble. flush, small, quiet until you look for it. ===== */
-.frame-top {
-  display: flex;
-  justify-content: flex-end;
-  padding: 8px 10px 0;
+/* ===== display + theme control - ONE dark surface, not a separate
+   lighter strip sitting above a darker display. the toggle is a small
+   corner control sharing this same background, which is what makes it
+   feel integrated rather than floating alone above the calculator. ===== */
+.display-wrap {
+  position: relative;
+  background: var(--display-bg);
+  transition: background 0.2s ease;
 }
 
 #theme-toggle {
+  position: absolute;
+  top: 6px;
+  right: 8px;
   background: none;
   border: none;
   color: var(--cream);
-  opacity: 0.7;
-  font-size: 1rem;
+  opacity: 0.55;
+  font-size: 0.85rem;
   line-height: 1;
-  padding: 6px 8px;
+  padding: 5px 6px;
   cursor: pointer;
   border-radius: 4px;
 }
-#theme-toggle:hover { opacity: 1; }
+#theme-toggle:hover { opacity: 0.9; }
 #theme-toggle:active { transform: scale(0.92); }
 
-/* ===== display - a dark, recessed screen, the one thing the eye should
-   land on first. deliberately NOT the same surface as the keys. ===== */
 .display {
-  background: var(--display-bg);
   color: var(--cream);
   text-align: right;
   font-size: 2.6rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  padding: 0.4rem 1.1rem 1rem;
+  padding: 1.5rem 1.1rem 1rem;
   overflow-x: auto;
   white-space: nowrap;
-  transition: background 0.2s ease;
 }
 
 /* the display renders slightly bolder when showing a completed result
@@ -104,23 +107,52 @@ body.dark { background: #0D0908; }
    justCalculated flag purely at the styling layer, no new state */
 .display.result { font-weight: 700; }
 
-/* ===== the seam - coral's ONLY appearance besides focus rings. a
-   deliberate structural line between the screen and the keypad, not a
-   plain margin. ===== */
+/* ===== the seam - coral's ONLY appearance besides focus rings ===== */
 .seam {
   height: 3px;
   background: var(--seam);
   margin: 0 1.1rem;
 }
 
-/* ===== the keypad - flat regions of one surface, separated by the
-   shell's own colour as the gap between them, not individual shadows ===== */
+/* ===== the keypad =====
+   a real 4-column grid: three equal-width columns on the left for
+   utility actions, numbers, zero and the decimal point, plus ONE
+   consistently narrow column on the right for every operator AND
+   equals - top to bottom, no exceptions. this is the actual structural
+   fix: operators no longer split between a mixed top row and a separate
+   side column, and equals is sized like every other key in that column
+   rather than a two-row block that dominated the right side. */
 .buttons {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 3px;
-  padding: 3px;
+  grid-template-columns: 1fr 1fr 1fr 0.82fr;
+  grid-template-areas:
+    "clear clear back  op-div"
+    "n7    n8    n9    op-mul"
+    "n4    n5    n6    op-sub"
+    "n1    n2    n3    op-add"
+    "zero  zero  dot   equal";
+  gap: 1.5px;
+  padding: 1.5px;
 }
+
+.clear   { grid-area: clear; }
+.back    { grid-area: back; }
+.op-div  { grid-area: op-div; }
+.n7      { grid-area: n7; }
+.n8      { grid-area: n8; }
+.n9      { grid-area: n9; }
+.op-mul  { grid-area: op-mul; }
+.n4      { grid-area: n4; }
+.n5      { grid-area: n5; }
+.n6      { grid-area: n6; }
+.op-sub  { grid-area: op-sub; }
+.n1      { grid-area: n1; }
+.n2      { grid-area: n2; }
+.n3      { grid-area: n3; }
+.op-add  { grid-area: op-add; }
+.zero    { grid-area: zero; }
+.dot     { grid-area: dot; }
+.equal   { grid-area: equal; }
 
 .btn {
   font-family: inherit;
@@ -136,22 +168,23 @@ body.dark { background: #0D0908; }
 }
 
 /* numbers and operators share the exact same fill - the only difference
-   is the operator glyph's own colour, weight and size, plus its narrower
-   footprint (below). no hover-lift, ever - press states are inset only. */
+   is the operator glyph's own colour and weight, plus the column's
+   narrower width (structural, not per-key inset now - see grid-template-
+   columns above). no hover-lift, ever - press states are inset only. */
 .btn:active {
   background: var(--key-bg-active);
   transform: scale(0.97);
 }
 
-/* ===== operators: distinguished by proportion and glyph, not fill.
-   inset horizontally within their own grid cell so the shell colour
-   shows through as a frame around them - a real geometric asymmetry
-   that survives being photocopied in black and white, not just colour
-   coding. ===== */
+/* ===== operators: one column, consistently narrow top to bottom,
+   distinguished by glyph colour and weight rather than a fill. no
+   per-key margin inset any more - the column itself is the narrow
+   shape, which is what makes the operator logic finally read as ONE
+   unified region instead of a mixed top row plus a separate side
+   column. ===== */
 .btn.op {
-  margin: 0 7px;
   color: var(--operator);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
 }
 
@@ -177,27 +210,22 @@ body.dark { background: #0D0908; }
   opacity: 0.6;
 }
 
-/* ===== equals: the one solid saturated key on the whole board. it
-   shares the shell's own colour (echoing the display, which is a dark
-   variant of the same family) rather than introducing a brighter
-   competing accent - hierarchy comes from being the one dark block in a
-   light keypad plus its existing size, not from being the loudest
-   colour on screen. it's smaller in area than the display and sits
-   below it, so it never competes with the display for first-glance
-   attention. ===== */
+/* ===== equals: sized like every other key in the operator column now -
+   not a giant two-row block. it's still the one solid saturated fill on
+   the board (sharing the shell's own colour, echoing the dark display),
+   but its hierarchy now comes from being the one dark block in a light
+   keypad, not from ALSO being oversized - a real de-emphasis, not just a
+   colour change. ===== */
 .btn.equal {
   background: var(--shell);
   color: var(--cream);
-  grid-row: span 2;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
 }
 .btn.equal:active {
   background: var(--display-bg);
   transform: scale(0.97);
 }
-
-.btn.zero { grid-column: span 2; }
 
 /* ===== keyboard focus - coral's other appearance. never removed. ===== */
 .btn:focus-visible,
@@ -212,7 +240,7 @@ body.dark { background: #0D0908; }
    targets below a comfortable size ===== */
 @media (max-width: 360px) {
   .calculator { width: calc(100vw - 20px); }
-  .display { font-size: 2.1rem; padding: 0.3rem 0.9rem 0.8rem; }
+  .display { font-size: 2.1rem; padding: 1.3rem 0.9rem 0.8rem; }
   .btn { padding: 15px 0; font-size: 1.15rem; }
-  .btn.op { margin: 0 5px; font-size: 1.3rem; }
+  .btn.op, .btn.equal { font-size: 1.25rem; }
 }

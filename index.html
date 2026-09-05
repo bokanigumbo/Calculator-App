@@ -10,44 +10,54 @@
 <body>
   <div class="calculator">
 
-    <!-- theme control integrated into the shell's own top edge, not a
-         floating circular button - same button element, same click
-         handler and aria-label logic in script.js, only the visual
-         container changes -->
-    <div class="frame-top">
-      <button id="theme-toggle" aria-label="Switch to dark mode">🌙</button>
-    </div>
+    <!-- theme control now lives INSIDE the display's own surface - a
+         small corner control sharing the display's dark background,
+         rather than a separate strip above it. this removes an entire
+         block of "dark mass" that used to sit before the display, and
+         the control no longer floats disconnected from anything - it's
+         visually part of the one screen element.
 
-    <!-- aria-live announces new results/errors to screen readers as they happen -->
-    <div class="display" id="display" role="status" aria-live="polite" aria-label="Calculator display">0</div>
+         #display itself stays a plain text element (script.js sets its
+         textContent directly on every keypress) - the toggle button is a
+         SEPARATE sibling inside a shared wrapper, not a child of #display,
+         so a render never overwrites the toggle button's own markup. -->
+    <div class="display-wrap">
+      <button id="theme-toggle" aria-label="Switch to dark mode">🌙</button>
+      <div class="display" id="display" role="status" aria-live="polite" aria-label="Calculator display">0</div>
+    </div>
 
     <!-- the coral seam - the one deliberate structural accent, separating
          the display from the keypad rather than colouring any key -->
     <div class="seam" aria-hidden="true"></div>
 
+    <!-- the operator column (÷ × − +) is now consistently narrow, top to
+         bottom, in its own grid column - not scattered across a mixed
+         top row and then a separate side column. C and ← are the row-1
+         utility actions on the left; equals is sized like every other
+         key in the operator column, not a giant two-row block. -->
     <div class="buttons">
-      <button class="btn util" data-action="clear" aria-label="Clear">C</button>
-      <button class="btn op" data-action="append" data-value="/" aria-label="Divide">÷</button>
-      <button class="btn op" data-action="append" data-value="*" aria-label="Multiply">×</button>
-      <button class="btn util" data-action="backspace" aria-label="Backspace, delete last character">←</button>
+      <button class="btn util clear" data-action="clear" aria-label="Clear">C</button>
+      <button class="btn util back" data-action="backspace" aria-label="Backspace, delete last character">←</button>
+      <button class="btn op op-div" data-action="append" data-value="/" aria-label="Divide">÷</button>
 
-      <button class="btn num" data-action="append" data-value="7">7</button>
-      <button class="btn num" data-action="append" data-value="8">8</button>
-      <button class="btn num" data-action="append" data-value="9">9</button>
-      <button class="btn op" data-action="append" data-value="-" aria-label="Subtract">−</button>
+      <button class="btn num n7" data-action="append" data-value="7">7</button>
+      <button class="btn num n8" data-action="append" data-value="8">8</button>
+      <button class="btn num n9" data-action="append" data-value="9">9</button>
+      <button class="btn op op-mul" data-action="append" data-value="*" aria-label="Multiply">×</button>
 
-      <button class="btn num" data-action="append" data-value="4">4</button>
-      <button class="btn num" data-action="append" data-value="5">5</button>
-      <button class="btn num" data-action="append" data-value="6">6</button>
-      <button class="btn op" data-action="append" data-value="+" aria-label="Add">+</button>
+      <button class="btn num n4" data-action="append" data-value="4">4</button>
+      <button class="btn num n5" data-action="append" data-value="5">5</button>
+      <button class="btn num n6" data-action="append" data-value="6">6</button>
+      <button class="btn op op-sub" data-action="append" data-value="-" aria-label="Subtract">−</button>
 
-      <button class="btn num" data-action="append" data-value="1">1</button>
-      <button class="btn num" data-action="append" data-value="2">2</button>
-      <button class="btn num" data-action="append" data-value="3">3</button>
-      <button class="btn equal" data-action="calculate" aria-label="Equals">=</button>
+      <button class="btn num n1" data-action="append" data-value="1">1</button>
+      <button class="btn num n2" data-action="append" data-value="2">2</button>
+      <button class="btn num n3" data-action="append" data-value="3">3</button>
+      <button class="btn op op-add" data-action="append" data-value="+" aria-label="Add">+</button>
 
       <button class="btn num zero" data-action="append" data-value="0">0</button>
-      <button class="btn num" data-action="append" data-value="." aria-label="Decimal point">.</button>
+      <button class="btn num dot" data-action="append" data-value="." aria-label="Decimal point">.</button>
+      <button class="btn equal" data-action="calculate" aria-label="Equals">=</button>
     </div>
   </div>
 
