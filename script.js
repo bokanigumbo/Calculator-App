@@ -14,6 +14,11 @@ const toggleBtn = document.getElementById("theme-toggle");
 
 function render(state) {
   displayEl.textContent = state.expression;
+  // purely presentational: input-state.js already tracks justCalculated
+  // as part of its state - reading it here to render a completed result
+  // slightly bolder than live-typed input adds no new state and changes
+  // no calculator behaviour at all
+  displayEl.classList.toggle("result", state.justCalculated);
 }
 
 const inputState = InputState.createInputState({

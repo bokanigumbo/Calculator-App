@@ -3,41 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cute Calculator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet" />
+  <title>Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- dark mode toggle -->
-  <button id="theme-toggle" aria-label="Switch to dark mode">🌙</button>
-
-  <!-- calculator -->
   <div class="calculator">
+
+    <!-- theme control integrated into the shell's own top edge, not a
+         floating circular button - same button element, same click
+         handler and aria-label logic in script.js, only the visual
+         container changes -->
+    <div class="frame-top">
+      <button id="theme-toggle" aria-label="Switch to dark mode">🌙</button>
+    </div>
+
     <!-- aria-live announces new results/errors to screen readers as they happen -->
     <div class="display" id="display" role="status" aria-live="polite" aria-label="Calculator display">0</div>
+
+    <!-- the coral seam - the one deliberate structural accent, separating
+         the display from the keypad rather than colouring any key -->
+    <div class="seam" aria-hidden="true"></div>
+
     <div class="buttons">
-      <button class="btn" data-action="clear" aria-label="Clear">C</button>
-      <button class="btn" data-action="append" data-value="/" aria-label="Divide">÷</button>
-      <button class="btn" data-action="append" data-value="*" aria-label="Multiply">×</button>
-      <button class="btn" data-action="backspace" aria-label="Backspace, delete last character">←</button>
+      <button class="btn util" data-action="clear" aria-label="Clear">C</button>
+      <button class="btn op" data-action="append" data-value="/" aria-label="Divide">÷</button>
+      <button class="btn op" data-action="append" data-value="*" aria-label="Multiply">×</button>
+      <button class="btn util" data-action="backspace" aria-label="Backspace, delete last character">←</button>
 
-      <button class="btn" data-action="append" data-value="7">7</button>
-      <button class="btn" data-action="append" data-value="8">8</button>
-      <button class="btn" data-action="append" data-value="9">9</button>
-      <button class="btn" data-action="append" data-value="-" aria-label="Subtract">−</button>
+      <button class="btn num" data-action="append" data-value="7">7</button>
+      <button class="btn num" data-action="append" data-value="8">8</button>
+      <button class="btn num" data-action="append" data-value="9">9</button>
+      <button class="btn op" data-action="append" data-value="-" aria-label="Subtract">−</button>
 
-      <button class="btn" data-action="append" data-value="4">4</button>
-      <button class="btn" data-action="append" data-value="5">5</button>
-      <button class="btn" data-action="append" data-value="6">6</button>
-      <button class="btn" data-action="append" data-value="+" aria-label="Add">+</button>
+      <button class="btn num" data-action="append" data-value="4">4</button>
+      <button class="btn num" data-action="append" data-value="5">5</button>
+      <button class="btn num" data-action="append" data-value="6">6</button>
+      <button class="btn op" data-action="append" data-value="+" aria-label="Add">+</button>
 
-      <button class="btn" data-action="append" data-value="1">1</button>
-      <button class="btn" data-action="append" data-value="2">2</button>
-      <button class="btn" data-action="append" data-value="3">3</button>
+      <button class="btn num" data-action="append" data-value="1">1</button>
+      <button class="btn num" data-action="append" data-value="2">2</button>
+      <button class="btn num" data-action="append" data-value="3">3</button>
       <button class="btn equal" data-action="calculate" aria-label="Equals">=</button>
 
-      <button class="btn zero" data-action="append" data-value="0">0</button>
-      <button class="btn" data-action="append" data-value="." aria-label="Decimal point">.</button>
+      <button class="btn num zero" data-action="append" data-value="0">0</button>
+      <button class="btn num" data-action="append" data-value="." aria-label="Decimal point">.</button>
     </div>
   </div>
 

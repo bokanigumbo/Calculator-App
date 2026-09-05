@@ -1,124 +1,218 @@
-/* the Baloo 2 font is loaded via a <link> tag in index.html, not an
-   @import here - a link tag lets the browser discover and fetch it in
-   parallel with everything else; an @import forces a slower, blocking,
-   sequential fetch after this stylesheet itself loads. having both (as
-   this file used to) meant it was being requested twice for no benefit. */
+/* ===== calculator =====
+   one integrated object: a solid-coloured shell, a dark inset display,
+   and a keypad of flat, connected regions - not a rounded card holding a
+   collection of individually-shadowed floating buttons.
+
+   colour has exactly five roles, each used once: the shell/equals share
+   one colour (oxblood), the display is a dark variant of that same
+   colour family, keys and display text share a warm neutral (ecru/cream),
+   operator glyphs get one accent (mustard), and coral is reserved
+   entirely for focus rings and the one structural seam below the
+   display - never a key fill.
+*/
 
 :root {
-  --bg: #fff0f5;
-  --display-bg: #fff;
-  --button-bg: #ffeaf4;
-  --button-hover: #ffd6e8;
-  --text: #333;
-  --equal: #ff8fab;
-  --equal-hover: #ff6d8b;
+  --shell: #6B1F2A;        /* the object's own colour - also equals' fill */
+  --display-bg: #3D1219;   /* a darker variant of the shell - the "screen" */
+  --key-bg: #F3E9DA;       /* warm ecru - numbers, operators and utility keys all share this */
+  --key-bg-active: #E4D5BF;/* pressed-state contrast shift, not a lift */
+  --ink: #221A17;          /* primary text on ecru */
+  --cream: #F3E9DA;        /* text on dark surfaces (display, equals) */
+  --operator: #8F5F12;     /* mustard - operator glyphs ONLY, never a fill. deliberately deeper than a lighter gold: checked against --key-bg and the lighter tone only reached 2.48:1, below even WCAG's relaxed large-bold-text threshold of 3:1 - this reaches 4.58:1 */
+  --utility-ink: #8A5A61;  /* muted rose-oxblood - utility key text, the colour half of its two-part signal */
+  --seam: #E2543C;         /* coral - focus rings + the one seam, nowhere else */
+
+  --font: "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body.dark {
-  --bg: #2c2c38;
-  --display-bg: #3a3a4a;
-  --button-bg: #5a5a70;
-  --button-hover: #777799;
-  --text: #fefefe;
-  --equal: #ff709a;
-  --equal-hover: #ff4e7a;
+  --shell: #1C1412;
+  --display-bg: #120909;
+  --key-bg: #3A2C27;
+  --key-bg-active: #4A3A33;
+  --ink: #F3E9DA;
+  --cream: #F3E9DA;
+  --operator: #D9A62E;
+  --utility-ink: #C79098;
+  --seam: #E2543C;
 }
+
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--bg);
-  font-family: 'Baloo 2', cursive;
+  background: #EDE4D6;
+  font-family: var(--font);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  transition: background 0.3s ease;
+  min-height: 100vh;
+  transition: background 0.2s ease;
+}
+
+body.dark { background: #0D0908; }
+
+/* ===== the shell - one solid object, small confident radius, no card
+   shadow floating it above the page ===== */
+.calculator {
+  background: var(--shell);
+  border-radius: 10px;
+  width: min(320px, calc(100vw - 32px));
+  overflow: hidden;
+  transition: background 0.2s ease;
+}
+
+/* ===== theme control - integrated into the shell's own top edge, not a
+   floating circular bubble. flush, small, quiet until you look for it. ===== */
+.frame-top {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 10px 0;
 }
 
 #theme-toggle {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: var(--button-bg);
-  color: var(--text);
+  background: none;
   border: none;
-  font-size: 1.5rem;
-  padding: 10px 15px;
-  border-radius: 50%;
+  color: var(--cream);
+  opacity: 0.7;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 6px 8px;
   cursor: pointer;
-  transition: background 0.2s;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 4px;
 }
+#theme-toggle:hover { opacity: 1; }
+#theme-toggle:active { transform: scale(0.92); }
 
-#theme-toggle:hover {
-  background: var(--button-hover);
-}
-
-.calculator {
-  background: var(--display-bg);
-  border-radius: 30px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  width: min(330px, calc(100vw - 40px));
-  overflow: hidden;
-  padding: 20px;
-  transition: background 0.3s ease;
-}
-
+/* ===== display - a dark, recessed screen, the one thing the eye should
+   land on first. deliberately NOT the same surface as the keys. ===== */
 .display {
   background: var(--display-bg);
-  color: var(--text);
+  color: var(--cream);
   text-align: right;
-  font-size: 2.5rem;
-  padding: 1rem;
-  border-radius: 20px;
-  margin-bottom: 20px;
+  font-size: 2.6rem;
   font-weight: 600;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+  font-variant-numeric: tabular-nums;
+  padding: 0.4rem 1.1rem 1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  transition: background 0.2s ease;
 }
 
+/* the display renders slightly bolder when showing a completed result
+   rather than live-typed input - using input-state.js's existing
+   justCalculated flag purely at the styling layer, no new state */
+.display.result { font-weight: 700; }
+
+/* ===== the seam - coral's ONLY appearance besides focus rings. a
+   deliberate structural line between the screen and the keypad, not a
+   plain margin. ===== */
+.seam {
+  height: 3px;
+  background: var(--seam);
+  margin: 0 1.1rem;
+}
+
+/* ===== the keypad - flat regions of one surface, separated by the
+   shell's own colour as the gap between them, not individual shadows ===== */
 .buttons {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 3px;
+  padding: 3px;
 }
 
 .btn {
-  font-size: 1.4rem;
-  padding: 20px;
+  font-family: inherit;
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 18px 0;
   border: none;
-  border-radius: 15px;
-  background: var(--button-bg);
-  color: var(--text);
+  border-radius: 0;
+  background: var(--key-bg);
+  color: var(--ink);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: background 0.08s ease, transform 0.08s ease;
 }
 
-.btn:hover {
-  background: var(--button-hover);
-  transform: translateY(-2px);
+/* numbers and operators share the exact same fill - the only difference
+   is the operator glyph's own colour, weight and size, plus its narrower
+   footprint (below). no hover-lift, ever - press states are inset only. */
+.btn:active {
+  background: var(--key-bg-active);
+  transform: scale(0.97);
 }
 
-.equal {
-  background: var(--equal);
-  color: white;
+/* ===== operators: distinguished by proportion and glyph, not fill.
+   inset horizontally within their own grid cell so the shell colour
+   shows through as a frame around them - a real geometric asymmetry
+   that survives being photocopied in black and white, not just colour
+   coding. ===== */
+.btn.op {
+  margin: 0 7px;
+  color: var(--operator);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* ===== utility keys: two independent signals, not colour alone -
+   muted rose-oxblood text (colour) AND smaller/lighter weight plus an
+   underline rule (shape), so the category still reads correctly in
+   grayscale or for anyone who can't distinguish the colour at all ===== */
+.btn.util {
+  color: var(--utility-ink);
+  font-size: 1rem;
+  font-weight: 400;
+  position: relative;
+}
+.btn.util::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2px;
+  background: var(--utility-ink);
+  opacity: 0.6;
+}
+
+/* ===== equals: the one solid saturated key on the whole board. it
+   shares the shell's own colour (echoing the display, which is a dark
+   variant of the same family) rather than introducing a brighter
+   competing accent - hierarchy comes from being the one dark block in a
+   light keypad plus its existing size, not from being the loudest
+   colour on screen. it's smaller in area than the display and sits
+   below it, so it never competes with the display for first-glance
+   attention. ===== */
+.btn.equal {
+  background: var(--shell);
+  color: var(--cream);
   grid-row: span 2;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.btn.equal:active {
+  background: var(--display-bg);
+  transform: scale(0.97);
 }
 
-.equal:hover {
-  background: var(--equal-hover);
-}
+.btn.zero { grid-column: span 2; }
 
-.zero {
-  grid-column: span 2;
-}
-
-/* visible keyboard focus - the hover state alone doesn't show up for
-   keyboard/switch users tabbing through the buttons */
+/* ===== keyboard focus - coral's other appearance. never removed. ===== */
 .btn:focus-visible,
 #theme-toggle:focus-visible {
-  outline: 3px solid var(--equal);
-  outline-offset: 2px;
+  outline: 3px solid var(--seam);
+  outline-offset: -3px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== responsive - tighten spacing first, never shrink text or touch
+   targets below a comfortable size ===== */
+@media (max-width: 360px) {
+  .calculator { width: calc(100vw - 20px); }
+  .display { font-size: 2.1rem; padding: 0.3rem 0.9rem 0.8rem; }
+  .btn { padding: 15px 0; font-size: 1.15rem; }
+  .btn.op { margin: 0 5px; font-size: 1.3rem; }
 }
