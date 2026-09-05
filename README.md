@@ -1,8 +1,8 @@
 # cute calculator
 
-a pastel calculator built with vanilla HTML, CSS and JavaScript.
+a calculator built with vanilla HTML, CSS and JavaScript.
 
-[live demo](https://bokanigumbo.github.io/Calculator-App/)
+[live demo](https://bokanigumbo.github.io/calculator-app/)
 
 ## features
 
