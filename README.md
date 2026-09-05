@@ -2,7 +2,7 @@
 
 a pastel calculator built with vanilla HTML, CSS and JavaScript.
 
-[live demo](https://bokanigumbo.github.io/calculator-app/)
+[live demo](https://bokanigumbo.github.io/Calculator-App/)
 
 ## features
 

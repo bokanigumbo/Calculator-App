@@ -124,15 +124,15 @@ body.dark { background: #0D0908; }
    rather than a two-row block that dominated the right side. */
 .buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 0.82fr;
+  grid-template-columns: 1fr 1fr 1fr 0.78fr;
   grid-template-areas:
-    "clear clear back  op-div"
-    "n7    n8    n9    op-mul"
-    "n4    n5    n6    op-sub"
-    "n1    n2    n3    op-add"
-    "zero  zero  dot   equal";
-  gap: 1.5px;
-  padding: 1.5px;
+    "clear back back  op-div"
+    "n7    n8   n9    op-mul"
+    "n4    n5   n6    op-sub"
+    "n1    n2   n3    op-add"
+    "zero  zero dot   equal";
+  gap: 1px;
+  padding: 1px;
 }
 
 .clear   { grid-area: clear; }
