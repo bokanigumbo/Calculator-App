@@ -2,7 +2,9 @@
 
 a calculator built with vanilla HTML, CSS and JavaScript.
 
-[live demo](https://bokanigumbo.github.io/calculator-app/)
+![calculator preview](assets/calculator-preview.png)
+
+[try the live demo](https://bokanigumbo.github.io/calculator-app/)
 
 ## features
 
