@@ -1,15 +1,4 @@
-// calculator-engine.js
-//
-// pure calculation logic - no DOM in here at all, which is what makes it
-// possible to test directly (see tests/calculator-engine.test.js) without
-// needing a browser.
-//
-// this replaces eval(). eval() runs whatever string you hand it as actual
-// javascript, which is a lot more power than a calculator needs and exactly
-// the kind of thing a recruiter reviewing the code would flag immediately -
-// there's no way for the caller to tell the difference between "2+2" and
-// something far less innocent. this parser only understands numbers and
-// +, -, *, /, so there's no possibility of it ever doing anything else.
+// parses supported arithmetic without using eval
 
 class DivisionByZeroError extends Error {
   constructor() {
@@ -25,10 +14,7 @@ class InvalidExpressionError extends Error {
   }
 }
 
-// turns a raw string like "12.5*-3" into a flat list of number/operator
-// tokens. this is also where malformed numbers get caught - "4..2" fails
-// right here, since a number token is never allowed to contain more than
-// one decimal point.
+// split an expression into number and operator tokens
 function tokenize(expression) {
   const tokens = [];
   let i = 0;
@@ -52,12 +38,7 @@ function tokenize(expression) {
         throw new InvalidExpressionError("A number can't contain more than one decimal point");
       }
       const value = parseFloat(numStr);
-      // parseFloat(".") returns NaN (a decimal point with no digits either
-      // side of it isn't a number at all), and a digit string long enough
-      // to exceed Number.MAX_VALUE silently becomes Infinity - both are
-      // real values JavaScript happily hands back without erroring, so
-      // this has to check for them explicitly rather than trusting
-      // parseFloat's result is always a normal, usable number
+      // reject invalid or unsupported numbers
       if (!Number.isFinite(value)) {
         throw new InvalidExpressionError("Number is outside the supported range");
       }
@@ -77,14 +58,10 @@ function tokenize(expression) {
   return tokens;
 }
 
-// standard arithmetic precedence, left-to-right associativity:
+// arithmetic grammar:
 //   expression := term (('+' | '-') term)*
 //   term       := unary (('*' | '/') unary)*
 //   unary      := '-' unary | number
-//
-// the unary rule is what lets "5*-3" and "-5+2" parse correctly - a minus
-// sign is only ever "subtract" when it's sitting between two terms; anywhere
-// else it negates whatever comes right after it.
 function parse(tokens) {
   let pos = 0;
   const peek = () => tokens[pos];
@@ -139,8 +116,7 @@ function parse(tokens) {
   return result;
 }
 
-// rounds away the classic floating-point artefacts (0.1 + 0.2 producing
-// 0.30000000000000004) without meaningfully limiting real precision
+// remove common floating-point artefacts
 function roundResult(n) {
   return Math.round(n * 1e10) / 1e10;
 }
@@ -154,26 +130,14 @@ function evaluate(expression) {
     throw new InvalidExpressionError("Nothing to calculate");
   }
   const result = roundResult(parse(tokens));
-  // every individual number is already checked in tokenize() above, but
-  // the RESULT of an operation can still overflow even when both inputs
-  // were perfectly ordinary finite numbers (e.g. two large numbers
-  // multiplied together) - this is the second, separate place that needs
-  // checking, not a duplicate of the first
+  // reject overflow in the calculated result
   if (!Number.isFinite(result)) {
     throw new InvalidExpressionError("Number is outside the supported range");
   }
   return result;
 }
 
-// works both as a plain global in the browser (loaded via <script>, no
-// build step) and as a normal module in node (for the test suite).
-//
-// this needs to be an explicit namespace object (`CalculatorEngine`) in the
-// browser, not just bare global functions - script.js calls
-// CalculatorEngine.evaluate(...), and without this exact assignment that
-// would throw "CalculatorEngine is not defined" the moment a key is
-// pressed, despite the node test suite passing perfectly fine (require()
-// doesn't care what the exported object is named, only the browser does).
+// expose the engine to the browser and node tests
 const CalculatorEngineExports = { evaluate, tokenize, parse, DivisionByZeroError, InvalidExpressionError };
 
 if (typeof module !== "undefined" && module.exports) {

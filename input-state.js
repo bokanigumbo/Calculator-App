@@ -1,15 +1,4 @@
-// input-state.js
-//
-// the calculator's display-state logic (what happens to the expression
-// string as each key is pressed) extracted out of script.js, so it can be
-// tested directly without a browser or a DOM. this was flagged during
-// review as worth doing "eventually" rather than relying only on manual
-// testing forever - this is that.
-//
-// no document/window/render() calls in here at all - a caller provides an
-// onChange callback if it wants to know when something changed (script.js
-// uses this to actually update the screen), but this module itself has no
-// opinion about how or whether the result gets displayed anywhere.
+// manages calculator input without depending on the dom
 (function () {
 
   function createInputState({ onChange, evaluate } = {}) {
@@ -25,9 +14,7 @@
       return ch === "+" || ch === "-" || ch === "*" || ch === "/";
     }
 
-    // the number segment currently being typed - everything after the
-    // last operator (or the whole expression, if there isn't one yet).
-    // used to stop a second decimal point being added to the SAME number.
+    // get the number currently being typed
     function currentSegment() {
       let lastOpIndex = -1;
       for (let i = 0; i < expression.length; i++) {
@@ -76,12 +63,7 @@
         if (isOperator(last)) {
           const previous = expression[expression.length - 2];
 
-          // the trailing "-" might itself be a unary minus sitting right
-          // after ANOTHER operator (e.g. "5*-" from 5, *, -). replacing
-          // just that trailing "-" with a new operator would leave the
-          // earlier operator behind unchanged, producing something like
-          // "5**" - both the unary minus and the operator before it need
-          // to go together in that case, not just the last character.
+          // replace both operators after a trailing unary minus
           if (last === "-" && isOperator(previous)) {
             expression = expression.slice(0, -2) + char;
           } else if (char === "-" && last !== "-") {

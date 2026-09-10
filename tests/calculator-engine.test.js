@@ -1,13 +1,4 @@
-// tests/calculator-engine.test.js
-//
-// tests the pure calculation engine directly - no browser or dom needed,
-// since calculator-engine.js has no dependency on either. run with `npm test`.
-//
-// deliberately doesn't try to test script.js's dom/keyboard wiring here -
-// that would need a real browser environment (jsdom or similar) to do
-// properly, which felt like a heavier addition than this project needs.
-// the engine is where the actual logic (and the actual bugs from the
-// original report) lived, so that's what's covered.
+// calculation engine unit tests
 
 const assert = require("assert");
 const { evaluate, DivisionByZeroError, InvalidExpressionError } = require("../calculator-engine.js");
@@ -88,37 +79,24 @@ test("trailing operator is rejected: 5+", () => {
 });
 
 test("a decimal point with no digits either side of it is rejected: .", () => {
-  // parseFloat(".") silently returns NaN in plain javascript - this is
-  // exactly the kind of "technically a number, not actually a number"
-  // result that needed an explicit finite-value check to catch
+  // reject a decimal point without digits
   assert.throws(() => evaluate("."), InvalidExpressionError);
 });
 
 test("a result that overflows past Number.MAX_VALUE is rejected, not silently returned as Infinity", () => {
-  // two individually finite numbers whose PRODUCT exceeds javascript's
-  // maximum representable number (~1.8e308) - this is the second,
-  // separate check (on the calculated result), not the same code path as
-  // the "individual number too large" test below
-  const bigButFiniteNumber = "9".repeat(160); // ~1e160, well within finite range on its own
+  // reject overflow after calculation
+  const bigButFiniteNumber = "9".repeat(160);
   assert.throws(() => evaluate(`${bigButFiniteNumber}*${bigButFiniteNumber}`), InvalidExpressionError);
 });
 
 test("a single number literal too large to represent at all is rejected: a 400-digit number", () => {
-  // this one overflows to Infinity from parseFloat() on the number ITSELF,
-  // before any arithmetic even happens - catches it at tokenize time, not
-  // calculation time
+  // reject overflow while tokenising
   const impossiblyLongNumber = "9".repeat(400);
   assert.throws(() => evaluate(impossiblyLongNumber), InvalidExpressionError);
 });
 
 test("repeated unary minus signs are supported and evaluate as double negation: --5 equals 5", () => {
-  // this calculator DOES intentionally support this: the grammar already
-  // handles any number of leading unary minus signs correctly as nested
-  // negation, and "negative of a negative" is genuinely correct arithmetic
-  // (not an input a user could actually type via the on-screen/keyboard
-  // UI, since script.js's own input handling replaces a second consecutive
-  // "-" rather than stacking it - but the engine itself is intentionally
-  // correct for direct/programmatic use beyond just this one UI)
+  // support nested unary negation in the engine
   assert.strictEqual(evaluate("--5"), 5);
 });
 
@@ -126,7 +104,7 @@ test("three repeated unary minus signs correctly evaluate as an odd number of ne
   assert.strictEqual(evaluate("---5"), -5);
 });
 
-// ===== runner =====
+// test runner
 let passed = 0, failed = 0;
 for (const { name, fn } of tests) {
   try {

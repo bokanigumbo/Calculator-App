@@ -1,10 +1,4 @@
-// tests/input-state.test.js
-//
-// tests the display-state logic (what happens to the expression string as
-// keys are pressed) directly, with no browser or DOM needed - this is the
-// extraction that was flagged during review as worth doing so this exact
-// class of bug (malformed operator sequences) could actually be tested,
-// rather than only ever checked by hand in a real browser.
+// input-state unit tests
 
 const assert = require("assert");
 const { createInputState } = require("../input-state.js");
@@ -54,11 +48,7 @@ test("the same fix applies however the second operator arrives: 5*-+ produces 5+
 });
 
 test("a second minus right after the first also goes through the same collapse-and-replace path: 5*-- becomes 5-", () => {
-  // tracing the exact given fix: after "5*-", pressing "-" again still
-  // matches `last === "-" && isOperator(previous)` regardless of what the
-  // new character is - so this collapses the "*" and the trailing "-"
-  // together and replaces both with the new "-", the same as it would for
-  // any other operator arriving in that position
+  // collapse the previous operator and unary minus
   const state = createInputState({ evaluate });
   press(state, "5*--");
   assert.strictEqual(state.getState().expression, "5-");

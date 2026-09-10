@@ -10,31 +10,24 @@
 <body>
   <div class="calculator">
 
-    <!-- theme control now lives INSIDE the display's own surface - a
-         small corner control sharing the display's dark background,
-         rather than a separate strip above it. this removes an entire
-         block of "dark mass" that used to sit before the display, and
-         the control no longer floats disconnected from anything - it's
-         visually part of the one screen element.
-
-         #display itself stays a plain text element (script.js sets its
-         textContent directly on every keypress) - the toggle button is a
-         SEPARATE sibling inside a shared wrapper, not a child of #display,
-         so a render never overwrites the toggle button's own markup. -->
+    <!-- display and theme control -->
     <div class="display-wrap">
-      <button id="theme-toggle" aria-label="Switch to dark mode">🌙</button>
+      <button id="theme-toggle" aria-label="Switch to dark mode">
+        <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path class="moon-icon" d="M20.4 15.1A8.5 8.5 0 0 1 8.9 3.6 8.5 8.5 0 1 0 20.4 15.1Z"/>
+          <g class="sun-icon">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+          </g>
+        </svg>
+      </button>
       <div class="display" id="display" role="status" aria-live="polite" aria-label="Calculator display">0</div>
     </div>
 
-    <!-- the coral seam - the one deliberate structural accent, separating
-         the display from the keypad rather than colouring any key -->
+    <!-- display divider -->
     <div class="seam" aria-hidden="true"></div>
 
-    <!-- the operator column (÷ × − +) is now consistently narrow, top to
-         bottom, in its own grid column - not scattered across a mixed
-         top row and then a separate side column. C and ← are the row-1
-         utility actions on the left; equals is sized like every other
-         key in the operator column, not a giant two-row block. -->
+    <!-- calculator keypad -->
     <div class="buttons">
       <button class="btn util clear" data-action="clear" aria-label="Clear">C</button>
       <button class="btn util back" data-action="backspace" aria-label="Backspace, delete last character">←</button>

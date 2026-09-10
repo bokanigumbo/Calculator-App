@@ -1,28 +1,16 @@
-/* ===== calculator =====
-   one integrated object: a solid-coloured shell, a dark inset display,
-   and a keypad of flat, connected regions - not a rounded card holding a
-   collection of individually-shadowed floating buttons.
-
-   colour keeps its five roles unchanged from the previous pass - this
-   revision is entirely about geometry and weight distribution, not
-   colour: a consistently narrow operator column top-to-bottom (rather
-   than operators being scattered across a mixed top row and then a
-   separate side column), a proportionate equals key instead of a giant
-   two-row block, thinner internal grid lines, and a theme toggle that
-   lives inside the display's own surface instead of a separate strip
-   above it.
-*/
+/* colour palette */
 
 :root {
-  --shell: #6B1F2A;        /* the object's own colour - also equals' fill */
-  --display-bg: #3D1219;   /* a darker variant of the shell - the "screen" */
-  --key-bg: #F3E9DA;       /* warm ecru - numbers, operators and utility keys all share this */
-  --key-bg-active: #E4D5BF;/* pressed-state contrast shift, not a lift */
-  --ink: #221A17;          /* primary text on ecru */
-  --cream: #F3E9DA;        /* text on dark surfaces (display, equals) */
-  --operator: #8F5F12;     /* mustard - operator glyphs ONLY, never a fill. deliberately deeper than a lighter gold: checked against --key-bg and the lighter tone only reached 2.48:1, below even WCAG's relaxed large-bold-text threshold of 3:1 - this reaches 4.58:1 */
-  --utility-ink: #8A5A61;  /* muted rose-oxblood - utility key text, the colour half of its two-part signal */
-  --seam: #E2543C;         /* coral - focus rings + the one seam, nowhere else */
+  --shell: #6B1F2A;
+  --display-bg: #3D1219;
+  --key-bg: #F3E9DA;
+  --key-bg-active: #E4D5BF;
+  --ink: #221A17;
+  --cream: #F3E9DA;
+  --operator: #8F5F12;
+  --utility-ink: #8A5A61;
+  --seam: #E2543C;
+  --grid: rgba(107, 31, 42, 0.42);
 
   --font: "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -37,6 +25,7 @@ body.dark {
   --operator: #D9A62E;
   --utility-ink: #C79098;
   --seam: #E2543C;
+  --grid: rgba(18, 9, 9, 0.72);
 }
 
 * { box-sizing: border-box; }
@@ -54,8 +43,7 @@ body {
 
 body.dark { background: #0D0908; }
 
-/* ===== the shell - one solid object, small confident radius, no card
-   shadow floating it above the page ===== */
+/* calculator shell */
 .calculator {
   background: var(--shell);
   border-radius: 10px;
@@ -64,10 +52,7 @@ body.dark { background: #0D0908; }
   transition: background 0.2s ease;
 }
 
-/* ===== display + theme control - ONE dark surface, not a separate
-   lighter strip sitting above a darker display. the toggle is a small
-   corner control sharing this same background, which is what makes it
-   feel integrated rather than floating alone above the calculator. ===== */
+/* display */
 .display-wrap {
   position: relative;
   background: var(--display-bg);
@@ -91,6 +76,21 @@ body.dark { background: #0D0908; }
 #theme-toggle:hover { opacity: 0.9; }
 #theme-toggle:active { transform: scale(0.92); }
 
+.theme-icon {
+  display: block;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sun-icon { display: none; }
+body.dark .moon-icon { display: none; }
+body.dark .sun-icon { display: initial; }
+
 .display {
   color: var(--cream);
   text-align: right;
@@ -102,26 +102,17 @@ body.dark { background: #0D0908; }
   white-space: nowrap;
 }
 
-/* the display renders slightly bolder when showing a completed result
-   rather than live-typed input - using input-state.js's existing
-   justCalculated flag purely at the styling layer, no new state */
+/* completed result */
 .display.result { font-weight: 700; }
 
-/* ===== the seam - coral's ONLY appearance besides focus rings ===== */
+/* display divider */
 .seam {
   height: 3px;
   background: var(--seam);
   margin: 0 1.1rem;
 }
 
-/* ===== the keypad =====
-   a real 4-column grid: three equal-width columns on the left for
-   utility actions, numbers, zero and the decimal point, plus ONE
-   consistently narrow column on the right for every operator AND
-   equals - top to bottom, no exceptions. this is the actual structural
-   fix: operators no longer split between a mixed top row and a separate
-   side column, and equals is sized like every other key in that column
-   rather than a two-row block that dominated the right side. */
+/* keypad */
 .buttons {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 0.78fr;
@@ -133,6 +124,7 @@ body.dark { background: #0D0908; }
     "zero  zero dot   equal";
   gap: 1px;
   padding: 1px;
+  background: var(--grid);
 }
 
 .clear   { grid-area: clear; }
@@ -167,55 +159,27 @@ body.dark { background: #0D0908; }
   transition: background 0.08s ease, transform 0.08s ease;
 }
 
-/* numbers and operators share the exact same fill - the only difference
-   is the operator glyph's own colour and weight, plus the column's
-   narrower width (structural, not per-key inset now - see grid-template-
-   columns above). no hover-lift, ever - press states are inset only. */
+/* pressed state */
 .btn:active {
   background: var(--key-bg-active);
   transform: scale(0.97);
 }
 
-/* ===== operators: one column, consistently narrow top to bottom,
-   distinguished by glyph colour and weight rather than a fill. no
-   per-key margin inset any more - the column itself is the narrow
-   shape, which is what makes the operator logic finally read as ONE
-   unified region instead of a mixed top row plus a separate side
-   column. ===== */
+/* operators */
 .btn.op {
   color: var(--operator);
   font-size: 1.4rem;
   font-weight: 700;
 }
 
-/* ===== utility keys: two independent signals, not colour alone -
-   muted rose-oxblood text (colour) AND smaller/lighter weight plus an
-   underline rule (shape), so the category still reads correctly in
-   grayscale or for anyone who can't distinguish the colour at all ===== */
+/* utility keys */
 .btn.util {
   color: var(--utility-ink);
   font-size: 1rem;
   font-weight: 400;
-  position: relative;
-}
-.btn.util::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 12px;
-  transform: translateX(-50%);
-  width: 18px;
-  height: 2px;
-  background: var(--utility-ink);
-  opacity: 0.6;
 }
 
-/* ===== equals: sized like every other key in the operator column now -
-   not a giant two-row block. it's still the one solid saturated fill on
-   the board (sharing the shell's own colour, echoing the dark display),
-   but its hierarchy now comes from being the one dark block in a light
-   keypad, not from ALSO being oversized - a real de-emphasis, not just a
-   colour change. ===== */
+/* equals */
 .btn.equal {
   background: var(--shell);
   color: var(--cream);
@@ -227,7 +191,7 @@ body.dark { background: #0D0908; }
   transform: scale(0.97);
 }
 
-/* ===== keyboard focus - coral's other appearance. never removed. ===== */
+/* keyboard focus */
 .btn:focus-visible,
 #theme-toggle:focus-visible {
   outline: 3px solid var(--seam);
@@ -236,8 +200,7 @@ body.dark { background: #0D0908; }
   z-index: 1;
 }
 
-/* ===== responsive - tighten spacing first, never shrink text or touch
-   targets below a comfortable size ===== */
+/* small screens */
 @media (max-width: 360px) {
   .calculator { width: calc(100vw - 20px); }
   .display { font-size: 2.1rem; padding: 1.3rem 0.9rem 0.8rem; }
